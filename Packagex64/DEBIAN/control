@@ -1,0 +1,10 @@
+Source: pl
+Section: science
+Priority: extra
+Maintainer: Felix Kimmerle FelixKimmerle@hotmail.com
+Standards-Version: 1.0.0
+Homepage: atombier.de/felix
+Package:pl
+Version:1.0.0
+Architecture:amd64
+Description:pl is a program to create truth-tables from logical expressions
