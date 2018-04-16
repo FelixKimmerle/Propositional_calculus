@@ -7,6 +7,8 @@ bool Parser::Calc(std::map<char, bool> pVarTable)
 {
     VarTable = pVarTable;
     m_Pos = 0;
+    m_bEnd = false;
+    m_bError = false;
     currentToken = m_LResult.Tokens[m_Pos];
     return Level0();
 }
@@ -85,6 +87,7 @@ Parser::PResult Parser::CalcAll(std::string text)
         result.contradiction = false;
         result.Results.insert(std::make_pair("", Calc()));
     }
+    result.error = m_bError;
     return result;
 }
 std::vector<char> Parser::getVariables()
@@ -95,40 +98,41 @@ std::vector<char> Parser::getVariables()
 bool Parser::Level0()
 {
     bool result = Level1();
-    while (currentToken.getType() == Token::Types::AND ||
-           currentToken.getType() == Token::Types::OR ||
-           currentToken.getType() == Token::Types::EQUAL ||
-           currentToken.getType() == Token::Types::NOT ||
-           currentToken.getType() == Token::Types::IMPLICATION ||
-           currentToken.getType() == Token::Types::XOR)
+    while ((currentToken.getType() == Token::Types::AND ||
+            currentToken.getType() == Token::Types::OR ||
+            currentToken.getType() == Token::Types::EQUAL ||
+            currentToken.getType() == Token::Types::NOT ||
+            currentToken.getType() == Token::Types::IMPLICATION ||
+            currentToken.getType() == Token::Types::XOR) &&
+           !m_bEnd)
     {
         switch (currentToken.getType())
         {
         case Token::Types::AND:
-            getNextToken();
+            getNextToken(true);
             result = Level1() && result;
             break;
         case Token::Types::OR:
-            getNextToken();
+            getNextToken(true);
             result = Level1() || result;
             break;
         case Token::Types::EQUAL:
-            getNextToken();
+            getNextToken(true);
             result = result == Level1();
             break;
         case Token::Types::NOT:
-            getNextToken();
+            getNextToken(true);
             if (currentToken.getType() == Token::Types::EQUAL)
             {
                 result = result != Level1();
             }
             break;
         case Token::Types::IMPLICATION:
-            getNextToken();
+            getNextToken(true);
             result = !(!Level1() && result);
             break;
         case Token::Types::XOR:
-            getNextToken();
+            getNextToken(true);
             result = Level1() ^ result;
             break;
         }
@@ -139,45 +143,56 @@ bool Parser::Level1()
 {
     bool bnot = false;
     bool res = false;
-    if (currentToken.getType() == Token::Types::NOT)
+    if (!m_bEnd)
     {
-        bnot = true;
-        getNextToken();
-    }
-    if (currentToken.getType() == Token::Types::BOPEN)
-    {
-        getNextToken();
-        res = Level0();
-        getNextToken();
-    }
+        if (currentToken.getType() == Token::Types::NOT)
+        {
+            bnot = true;
+            getNextToken();
+        }
+        if (currentToken.getType() == Token::Types::BOPEN)
+        {
+            getNextToken(true);
+            res = Level0();
+            getNextToken();
+        }
 
-    if (currentToken.getType() == Token::Types::VAR)
-    {
-        res = VarTable[currentToken.getValue()];
-        getNextToken();
-    }
-    if (currentToken.getType() == Token::Types::NUM)
-    {
-        if (currentToken.getValue() == '1')
+        if (currentToken.getType() == Token::Types::VAR)
         {
-            res = true;
+            res = VarTable[currentToken.getValue()];
+            getNextToken();
         }
-        else
+        if (currentToken.getType() == Token::Types::NUM)
         {
-            res = false;
+            if (currentToken.getValue() == '1')
+            {
+                res = true;
+            }
+            else
+            {
+                res = false;
+            }
+            getNextToken();
         }
-        getNextToken();
-    }
-    if (bnot)
-    {
-        return !res;
+        if (bnot)
+        {
+            return !res;
+        }
     }
     return res;
 }
-void Parser::getNextToken()
+void Parser::getNextToken(bool expect)
 {
     if (m_LResult.Tokens.size() > m_Pos + 1)
     {
         currentToken = m_LResult.Tokens[++m_Pos];
+    }
+    else
+    {
+        if (expect)
+        {
+            m_bError = true;
+        }
+        m_bEnd = true;
     }
 }

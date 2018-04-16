@@ -14,6 +14,7 @@ class Parser
 		std::vector<char> notdepend;
 		bool tautology;
 		bool contradiction;
+		bool error;
 	};
 
 	Parser();
@@ -25,7 +26,9 @@ class Parser
   private:
 	bool Level0();
 	bool Level1();
-	void getNextToken();
+	void getNextToken(bool expect = false);
+	bool m_bEnd;
+	bool m_bError;
 
 	int m_Pos;
 	std::map<char, bool> VarTable;
