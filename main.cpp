@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 				{
 					for (int l = 0; l < i->first.size(); l++)
 					{
-						std::cout << i->first[l] << " ";
+						std::cout << (char)(i->first[l]+48) << " ";
 					}
 					std::cout << "= " << i->second << std::endl;
 				}

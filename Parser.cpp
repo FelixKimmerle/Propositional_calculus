@@ -34,14 +34,14 @@ Parser::PResult Parser::CalcAll(std::string text)
         }
 
         std::map<char, bool> val;
-        auto list = Possibilities::calc("01", m_LResult.Variables.size());
+        auto list = Possibilities::calcboolean(m_LResult.Variables.size());
         for (int i = 0; i < list.size(); i++)
         {
             val.clear();
             for (int z = 0; z < m_LResult.Variables.size(); z++)
             {
                 bool v = false;
-                if (list[i][z] == '1')
+                if (list[i][z] == 1)
                 {
                     v = true;
                 }
