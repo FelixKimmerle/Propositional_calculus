@@ -2,7 +2,9 @@
 
 std::map<char, Token::Types> m_Definitions = {
     {'&', Token::Types::AND},
+    {'*', Token::Types::AND},
     {'|', Token::Types::OR},
+    {'+', Token::Types::OR},
     {'=', Token::Types::EQUAL},
     {'!', Token::Types::NOT},
     {'(', Token::Types::BOPEN},
