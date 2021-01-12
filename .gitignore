@@ -1,3 +1,4 @@
-.deb
 .vscode
 .vscode/
+debug/
+release/
